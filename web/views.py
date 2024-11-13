@@ -1,13 +1,25 @@
-from django.shortcuts import render # type: ignore
-from django.contrib.auth import authenticate, login, logout
-from django.contrib import messages
+from django.shortcuts import render, redirect # type: ignore
+from django.contrib.auth import authenticate, login, logout # type: ignore
+from django.contrib import messages # type: ignore
 
 # Create your views here.
 def home(request):
-    return render(request, 'home.html', {})
+    if request.method == 'POST':
+        username = request.POST['user_name']
+        password = request.POST['password']
 
-def login_user(request):
-    pass
+        user = authenticate(request, username = username, password = password)
+        if user is not None:
+            login(request, user)
+            messages.success(request,"Logged In !!!")
+            return redirect('home')
+        else:
+            messages.success(request, "Not Logged In !!!")
+            return redirect('home')
+    else:
+        return render(request, 'home.html', {})
 
 def logout_user(request):
-    pass
+    logout(request)
+    messages.success(request,"Logged Out ....")
+    return redirect('home')
